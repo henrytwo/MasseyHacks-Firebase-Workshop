@@ -52,3 +52,11 @@ yourProject
 If you used the default settings, everything under the `public`  folder will be accessible when your website is published. This is your website root.<br><br>
 To host your own content, simply place it in this directory. After that's done, you can publish it by running `firebase deploy`. Notice that Firebase automatically generates a URL which can be immediately used to access your website. A custom domain can be configured via the Firebase console.<br><br>
 Alternatively,  you can start the local development server by running `firebase serve`. This will come in handy when we need to test our website.
+
+### Firebase Cloud Firestore
+A really useful service that Firebase offers is Cloud Firestore. It's a realtime document based database. This means that Firestore will automatically propogate changes in the database to all connected apps in real time.<br><br>
+First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, let's select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
+(Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)<br><br>
+
+#### Writing data
+
