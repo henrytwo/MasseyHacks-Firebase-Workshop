@@ -53,10 +53,123 @@ If you used the default settings, everything under the `public`  folder will be 
 To host your own content, simply place it in this directory. After that's done, you can publish it by running `firebase deploy`. Notice that Firebase automatically generates a URL which can be immediately used to access your website. A custom domain can be configured via the Firebase console.<br><br>
 Alternatively,  you can start the local development server by running `firebase serve`. This will come in handy when we need to test our website.
 
+#### Setting up the libraries
+Since we're using Firebase Hosting, we can use the integrated CDN to serve all our libraries. Place these imports in your HTML:
+
+```
+<!-- update the version number as needed -->
+<script defer src="/__/firebase/7.14.4/firebase-app.js"></script>
+<script defer src="/__/firebase/7.14.4/firebase-auth.js"></script>
+<script defer src="/__/firebase/7.14.4/firebase-firestore.js"></script>
+<script defer src="/__/firebase/init.js"></script>
+```
+A full list can be found here: [https://firebase.google.com/docs/web/setup#available-libraries]<br><br>
+Next, start a JS file and initialize Firebase by creating a Firebase app object:
+```
+let app = firebase.app();
+```
+
+(Note: Usually you would have to configure your API key here, but since we're using Firebase Hosting your project will be automatically linked!)
+
 ### Firebase Cloud Firestore
 A really useful service that Firebase offers is Cloud Firestore. It's a realtime document based database. This means that Firestore will automatically propogate changes in the database to all connected apps in real time.<br><br>
 First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, let's select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
-(Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)<br><br>
+(Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)
+
+#### Database structure
+Firebase has a few different levels in its structure. At the highest level, there are collections which must be uniquely named. Collections contain documents which themselves can contain many fields. This is where you store your conventional data (i.e. strings, integers, or other collections!, etc.)<br><br>
+Example:
+```
+ |-cats <- Collection
+ |  |-cat1 <- Document
+ |  | |- "location": "Toronto" <- Field
+ |  | |- "social": "distance"
+ |  |-cat2
+ |    |- "meaningOfLife": 42
+ |
+ |-dogs
+   |-woofer
+   | |- "color": "purple"
+   |-2020
+     |- "status": "over" 
+```
+
+#### Setup
+Create a Firestore object:
+```
+var db = firebase.firestore();
+```
+(Note: Make sure you do this after creating the Firebase app object!)
 
 #### Writing data
+Here is a detailed guide: [https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document]<br><br>
 
+To directly set data:
+```
+db.collection("cities").doc("new-city-id").set({
+    name: "Tokyo",
+    country: "Japan"
+});
+```
+This is useful if you know the exact document ID you want.<br><br>
+To add data with an auto generated document ID:
+```
+db.collection("cities").add({
+    name: "Tokyo",
+    country: "Japan"
+})
+```
+
+#### Reading data
+Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data]<br><br>
+We can read data directly if we know the path:
+```
+db.collection("cities").doc("SF").get().then(function(doc) {
+    if (doc.exists) {
+        console.log("Document data:", doc.data());
+    } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+    }
+}).catch(function(error) {
+    console.log("Error getting document:", error);
+});
+```
+
+#### Listening for changes
+Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen#web]<br><br>
+We can also automatically listen for changes to the database:
+```
+db.collection("cities").doc("SF")
+    .onSnapshot(function(doc) {
+        console.log("Current data: ", doc.data());
+    });
+```
+This function will fire every time there is a change to the document.
+
+#### Security
+Detailed guide: [https://firebase.google.com/docs/firestore/security/get-started]<br><br>
+Security rules are important because they keep your data safe. Without them, people can see all your secrets! Or even worse, they can use all of your quota! Since they are run at every database interaction, they can also be used to validate data.<br><br>
+By default, these rules live in the `firestore.rules` file and are pushed automatically when `firebase deploy` is run.<br><br>
+Due to limited time, we won't be focusing too much on this.<br><br>
+Example security rule:
+```
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null && request.resource.data.owner == request.auth.uid && request.resource.data.text.size() <= 128;
+    }
+  }
+}
+```
+Breakdown:
+- `request.auth.uid` is the `uid` of the user initiating request
+- `request.resource.data` is the object being read/written (All sub attributes are the data itself)
+
+#### Best practices for handling data
+XSS is bad >:((((
+
+### Firebase Authentication
+
+### Firebase Python Admin SDK
