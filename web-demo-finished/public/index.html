@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MasseyHacks Messenger</title>
+
+  <!-- update the version number as needed -->
+  <script defer src="/__/firebase/7.14.4/firebase-app.js"></script>
+  <script defer src="/__/firebase/7.14.4/firebase-auth.js"></script>
+  <script defer src="/__/firebase/7.14.4/firebase-firestore.js"></script>
+  <script defer src="/__/firebase/init.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+          crossorigin="anonymous"></script>
+
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">MasseyHacks Messenger</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button id="login" type="button" class="btn btn-primary">Login with Google</button>
+        </li>
+        <li class="nav-item">
+          <button id="signout" type="button" class="btn btn-primary" style="display: none">Sign out</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbarText">
+      <span id="username" class="navbar-text" style="text-align: right; width: 100%;">
+      </span>
+    </div>
+  </nav>
+
+  <div id="main-list" class="container" style="display: none">
+    <div style="margin: 10px; margin-top: 50px; margin-bottom: 100px;">
+      <div id="list-area" ></div>
+    </div>
+
+    <div style="position: fixed; bottom: 0; width: 100%; padding: 20px; background: #343a40">
+      <div id="input-group" class="input-group mb-3">
+        <input id="textbox" type="text" class="form-control" placeholder="" aria-describedby="submit" maxlength="128">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="submit">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+
+      // Setup Firebase
+      let app = firebase.app();
+
+      // Firebase Auth
+      var provider = new firebase.auth.GoogleAuthProvider();
+
+      // Firestore
+      var db = firebase.firestore();
+
+      // Setup DB listener
+      function setupDB() {
+        db.collection("items")
+        .orderBy("timestamp", "desc")
+        .onSnapshot(function(querySnapshot) {
+          var items = [];
+
+          querySnapshot.forEach(function(doc) {
+            items.push(doc.data());
+          });
+
+          setList(items.reverse());
+        });
+      }
+
+      // Auth state listener
+      // Will be triggers when state changes
+      // (ex. User logs in first time, or page is loaded and they're already logged in)
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          sessionStorage.name = user.displayName;
+
+          $('#login').css("display", "none");
+          $('#main-list').css("display", "inline");
+          $('#signout').css("display", "inline");
+
+          $('#username').text(`Signed in as ${user.displayName}`);
+
+          setupDB();
+        } else {
+          // The user is not logged in, hide the messenger content
+          $('#login').css("display", "inline");
+          $('#main-list').css("display", "none");
+          $('#signout').css("display", "none");
+
+
+          $('#username').text(`Signed out`);
+        }
+      });
+
+      // Trigger login prompt
+      $("#login").on("click", function() {
+        firebase.auth().signInWithPopup(provider).then(function (result) {
+          // Signed in successfully.
+          console.log(result.user)
+        }).catch(function (error) {
+          // An error happened.
+          console.log(error);
+        });
+      });
+
+      // Trigger sign out
+      $("#signout").on("click", function() {
+        firebase.auth().signOut().then(function() {
+          // Sign-out successful.
+          console.log('Logged out!');
+        }, function(error) {
+          // An error happened.
+          console.log('Couldn\'t log out');
+        });
+      });
+
+      $("#submit").on("click", function () {
+        submitForm();
+      });
+
+      // Submit when enter key is pressed
+      $('#input-group').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode === 13){
+          submitForm();
+        }
+      });
+
+      function submitForm() {
+        let newText = $("#textbox").val();
+
+        if (newText.length > 0) {
+          db.collection("items").add({
+            text: newText,
+            timestamp: new Date().getTime(),
+            owner: sessionStorage.name
+          })
+          .then(function (docRef) {
+            console.log("Document written with ID: ", docRef.id);
+
+            // Clear textbox
+            $("#textbox").val("");
+          })
+          .catch(function (error) {
+            console.error("Error adding document: ", error);
+
+            alert("Uh oh! " + error);
+          });
+        }
+      }
+
+      // Ghetto method to list items on screen
+      function setList(list) {
+        // Ghetto solution to avoid JS injection
+        $('#list-area').html('');
+
+        for (let index in list) {
+          let id = Math.random().toString().substring(2);
+
+          $("#list-area").append("<div id=\"" + id + "\"class=\"alert alert-secondary\" role=\"alert\"></div>");
+
+          $('#' + id).text(`[${list[index].owner}] ${list[index].text}`);
+        }
+
+        $('html, body').stop().animate({
+          'scrollTop': document.body.scrollHeight
+        }, 500, 'swing');
+      }
+    });
+  </script>
+</body>
+</html>
