@@ -60,7 +60,7 @@ Alternatively,  you can start the local development server by running `firebase 
 #### Setting up the libraries
 Since we're using Firebase Hosting, we can use the integrated CDN to serve all our libraries. Place these imports in your HTML:
 
-```
+```html
 <!-- update the version number as needed -->
 <script defer src="/__/firebase/7.14.4/firebase-app.js"></script>
 <script defer src="/__/firebase/7.14.4/firebase-auth.js"></script>
@@ -101,7 +101,7 @@ Example:
 
 #### Setup
 Create a Firestore object:
-```
+```javascript
 var db = firebase.firestore();
 ```
 (Note: Make sure you do this after creating the Firebase app object!)
@@ -110,7 +110,7 @@ var db = firebase.firestore();
 Here is a detailed guide: [https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document]<br><br>
 
 To directly set data:
-```
+```javascript
 db.collection("cities").doc("new-city-id").set({
     name: "Tokyo",
     country: "Japan"
@@ -118,7 +118,7 @@ db.collection("cities").doc("new-city-id").set({
 ```
 This is useful if you know the exact document ID you want.<br><br>
 To add data with an auto generated document ID:
-```
+```javascript
 db.collection("cities").add({
     name: "Tokyo",
     country: "Japan"
@@ -128,7 +128,7 @@ db.collection("cities").add({
 #### Reading data
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data]<br><br>
 We can read data directly if we know the path:
-```
+```javascript
 db.collection("cities").doc("SF").get().then(function(doc) {
     if (doc.exists) {
         console.log("Document data:", doc.data());
@@ -144,7 +144,7 @@ db.collection("cities").doc("SF").get().then(function(doc) {
 #### Listening for changes
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen#web]<br><br>
 We can also automatically listen for changes to the database:
-```
+```javascript
 db.collection("cities").doc("SF")
     .onSnapshot(function(doc) {
         console.log("Current data: ", doc.data());
@@ -158,7 +158,7 @@ Security rules are important because they keep your data safe. Without them, peo
 By default, these rules live in the `firestore.rules` file and are pushed automatically when `firebase deploy` is run.<br><br>
 Due to limited time, we won't be focusing too much on this.<br><br>
 Example security rule:
-```
+```json
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
@@ -177,7 +177,7 @@ Breakdown:
 
 #### Best practices for handling data
 A good general rule of thumb is to never trust data that users provide. Let's say you're making a Twitter clone. Simple enough right? Just take whatever text they give you and add it to your HTML. Well... there's a bit of a problem with that. If you don't sanitize your input and treat it as HTML, a cleaver attacker could do something like submitting:
-```
+```html
 <script>
   alert("Ahahaha, now I'm running JavaScript on your machine!")
 </script>
@@ -201,7 +201,7 @@ Detailed guide: [https://firebase.google.com/docs/auth/web/google-signin]<br><br
  
 ####  Trigger a login window
 To trigger the  Google sign-in form, run:
-```
+```javascript
 firebase.auth().signInWithPopup(provider).then(function (result) {
   // This gives you a Google Access Token. You can use it to access the Google API.
   var token = result.credential.accessToken;
@@ -225,7 +225,7 @@ After logging in, other Firebase services such as Firestore will automatically b
  
 #### Trigger a sign out
 To immediately sign the user out, run:
-```
+```javascript
 firebase.auth().signOut().then(function() {
   // Sign-out successful.
   // This part will run if the user was signed out successfully
@@ -238,7 +238,7 @@ firebase.auth().signOut().then(function() {
 
 #### Listen for auth state change
 If you want to run some code as soon as the user logs in/logs off:
-```
+```javascript
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
@@ -273,7 +273,7 @@ To generate a service key, go to your Firebase console and click on the gear. Ne
 
 #### Setup
 The first thing you should do is import the libraries and authenticate:
-```
+```python
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -289,7 +289,7 @@ Detailed guide: [https://firebase.google.com/docs/firestore/quickstart] (Switch 
 
 This is the same idea as using Firestore on the web.
 
-```
+```python
 doc_ref = db.collection(u'users').document(u'alovelace')
 doc_ref.set({
     u'first': u'Ada',
@@ -300,7 +300,7 @@ doc_ref.set({
 
 #### Get data from Cloud Firestore
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data] (Switch to Python tab)
-```
+```python
 doc_ref = db.collection(u'cities').document(u'SF')
 
 doc = doc_ref.get()
@@ -313,7 +313,7 @@ else:
 #### Getting realtime updates from Cloud Firestore
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen] (Switch to Python Tab)<br><br>
 For this, we'll need to import the `threading` library. 
-```
+```python
 import threading
 
 # Create an Event for notifying main thread.

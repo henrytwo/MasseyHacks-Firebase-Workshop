@@ -188,6 +188,7 @@
           $('#' + id).text(`[${list[index].owner}] ${list[index].text}`);
         }
 
+        // Auto scroll to the bottom of the page
         $('html, body').stop().animate({
           'scrollTop': document.body.scrollHeight
         }, 500, 'swing');
