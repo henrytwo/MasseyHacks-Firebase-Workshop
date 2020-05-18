@@ -3,6 +3,10 @@
 
 ## Introduction
 
+### Starter code
+Since this workshop will be focused on the Firebase services, I'm going to be working with some website code that I've already baked ahead of time.<br><br>
+For the web portion of this workshop, check the `web-starter-code` directory. If you need to refer to the completed website, that's available in the `web-demo-finished` directory. Similarly, a small demo for the admin sdk  is available under `python-admin-sdk-demo`.
+
 ### What is Firebase?
 Firebase is a development platform by Google that offers services such as Web Hosting, Database, Authentication, etc.
 
