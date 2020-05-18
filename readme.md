@@ -69,7 +69,7 @@ Since we're using Firebase Hosting, we can use the integrated CDN to serve all o
 ```
 A full list can be found here: [https://firebase.google.com/docs/web/setup#available-libraries]<br><br>
 Next, start a JS file and initialize Firebase by creating a Firebase app object:
-```
+```javascript
 let app = firebase.app();
 ```
 
@@ -193,7 +193,7 @@ Go to the Firebase console and visit the Authentication section. Under the `Sign
 For this workshop, we'll focus on `Sign-In with Google` since it's basically set up out of the box.<br><br>
 After enabling `Google`, complete the form annd enter a support email and save your settings. Now we'll setup the code.<br><br>
 Create an auth provider object:
-```
+```javascript
 var provider = new firebase.auth.GoogleAuthProvider();
 ```
 
