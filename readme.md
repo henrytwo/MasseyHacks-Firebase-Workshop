@@ -159,6 +159,9 @@ service cloud.firestore {
     match /{document=**} {
       allow read: if request.auth.uid != null;
       allow create: if request.auth.uid != null && request.resource.data.owner == request.auth.uid && request.resource.data.text.size() <= 128;
+      allow update: if false;
+      allow delete: if false;
+      allow write: if false;
     }
   }
 }
@@ -168,8 +171,13 @@ Breakdown:
 - `request.resource.data` is the object being read/written (All sub attributes are the data itself)
 
 #### Best practices for handling data
-XSS is bad >:((((
-
+A good general rule of thumb is to never trust data that users provide. Let's say you're making a Twitter clone. Simple enough right? Just take whatever text they give you and add it to your HTML. Well... there's a bit of a problem with that. If you don't sanitize your input and treat it as HTML, a cleaver attacker could do something like submitting:
+```
+<script>
+  alert("Ahahaha, now I'm running JavaScript on your machine!")
+</script>
+```
+How do you prevent an attack like this? Depending on what you're using to build your website, there are different approaches. Frameworks such as Vue.js and React already have features to escape text and prevent this sort of attack. If you're using jQuery, `$(yourElement).text(userText)` is generally safe. Just be careful to never use `$(yourElement).html(userText)`.
 ### Firebase Authentication
 
 ### Firebase Python Admin SDK
