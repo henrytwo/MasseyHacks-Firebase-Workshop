@@ -74,7 +74,8 @@ let app = firebase.app();
 ### Firebase Cloud Firestore
 A really useful service that Firebase offers is Cloud Firestore. It's a realtime document based database. This means that Firestore will automatically propogate changes in the database to all connected apps in real time.<br><br>
 First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, let's select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
-(Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)
+(Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)<br><br>
+If you open up the Firebase console to the Firestore tab, you'll be ablee to see changes pushed to the DB in real time.
 
 #### Database structure
 Firebase has a few different levels in its structure. At the highest level, there are collections which must be uniquely named. Collections contain documents which themselves can contain many fields. This is where you store your conventional data (i.e. strings, integers, or other collections!, etc.)<br><br>
@@ -177,7 +178,157 @@ A good general rule of thumb is to never trust data that users provide. Let's sa
   alert("Ahahaha, now I'm running JavaScript on your machine!")
 </script>
 ```
-How do you prevent an attack like this? Depending on what you're using to build your website, there are different approaches. Frameworks such as Vue.js and React already have features to escape text and prevent this sort of attack. If you're using jQuery, `$(yourElement).text(userText)` is generally safe. Just be careful to never use `$(yourElement).html(userText)`.
+How do you prevent an attack like this? Depending on what you're using to build your website, there are different approaches. Frameworks such as Vue.js and React already have features to escape text and prevent this sort of attack. If you're using jQuery, `$(yourElement).text(userText)` is generally safe. Just be careful to never use `$(yourElement).html(userText)` since this will cause the user input to be treated as HTML.
+
 ### Firebase Authentication
+Detailed guide: [https://firebase.google.com/docs/auth]<br><br>
+Firebase Authentication integrates nicely with other services such as Firestore. It allows users to sign in with Email/Password or through other services such as Google, Facebook, etc. No matter which method they choose to use, Firebase handles the complicated OAUTH and links all the authentication methods together. This means you only need to worry about writing one set of code and Firebase will handle the rest.
+
+#### Setup
+Go to the Firebase console and visit the Authentication section. Under the `Sign-In method` tab, enable the methods that you want users to be able to log in with.<br><br>
+For this workshop, we'll focus on `Sign-In with Google` since it's basically set up out of the box.<br><br>
+After enabling `Google`, complete the form annd enter a support email and save your settings. Now we'll setup the code.<br><br>
+Create an auth provider object:
+```
+var provider = new firebase.auth.GoogleAuthProvider();
+```
+
+Detailed guide: [https://firebase.google.com/docs/auth/web/google-signin]<br><br>
+ 
+####  Trigger a login window
+To trigger the  Google sign-in form, run:
+```
+firebase.auth().signInWithPopup(provider).then(function (result) {
+  // This gives you a Google Access Token. You can use it to access the Google API.
+  var token = result.credential.accessToken;
+  // The signed-in user info.
+  var user = result.user;
+  
+  // This part will run if the login was successful
+
+}).catch(function (error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // The email of the user's account used.
+  var email = error.email;
+  // The firebase.auth.AuthCredential type that was used.
+  var credential = error.credential;
+  // ...
+});
+```
+After logging in, other Firebase services such as Firestore will automatically be updated.
+ 
+#### Trigger a sign out
+To immediately sign the user out, run:
+```
+firebase.auth().signOut().then(function() {
+  // Sign-out successful.
+  // This part will run if the user was signed out successfully
+
+}, function(error) {
+  // An error happened.
+  console.log('Could\'t logout')
+});
+```
+
+#### Listen for auth state change
+If you want to run some code as soon as the user logs in/logs off:
+```
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    var displayName = user.displayName;
+    var email = user.email;
+    var emailVerified = user.emailVerified;
+    var photoURL = user.photoURL;
+    var isAnonymous = user.isAnonymous;
+    var uid = user.uid;
+    var providerData = user.providerData;
+    // ...
+  } else {
+    // User is signed out.
+    // ...
+  }
+});
+```
 
 ### Firebase Python Admin SDK
+Detailed guide: [https://firebase.google.com/docs/reference/admin]<br><br>
+The Python Admin SDK is designed primarily for managing your Firebase app from your backend. Although you aren't supposed to use it for client applications, you can use it to quickly interface with Firebase services.
+
+#### Installation
+Using pip: `pip install firebase-admin` or `pip3 install firebase-admin` (Note: Might need to run as root)
+
+#### About Service keys
+Unlike using Firebase on the web, the Admin SDK uses service keys to link to your project. It is paramount that you do not publish these keys as anyone who has access to them can control your project.<br><br>
+(During hackathon environments you might push them to version control for convenience, just be aware of the risks involved. Someone could mess with your stuff!)
+
+#### Generating Service keys
+To generate a service key, go to your Firebase console and click on the gear. Next, under `Service accounts`, find `Firebase Admin SDK` and click `Create service account`. Finally, click `Generate new private key`. This should start a download of a JSON file. This is the file you want to keep safe.
+
+#### Setup
+The first thing you should do is import the libraries and authenticate:
+```
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate("path/to/serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+```
+
+#### Add data to Cloud Firestore
+Detailed guide: [https://firebase.google.com/docs/firestore/quickstart] (Switch to Python tab)<br><br>
+
+This is the same idea as using Firestore on the web.
+
+```
+doc_ref = db.collection(u'users').document(u'alovelace')
+doc_ref.set({
+    u'first': u'Ada',
+    u'last': u'Lovelace',
+    u'born': 1815
+})
+```
+
+#### Get data from Cloud Firestore
+Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data] (Switch to Python tab)
+```
+doc_ref = db.collection(u'cities').document(u'SF')
+
+doc = doc_ref.get()
+if doc.exists:
+    print(u'Document data: {}'.format(doc.to_dict()))
+else:
+    print(u'No such document!')
+```
+
+#### Getting realtime updates from Cloud Firestore
+Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen] (Switch to Python Tab)<br><br>
+For this, we'll need to import the `threading` library. 
+```
+import threading
+
+# Create an Event for notifying main thread.
+callback_done = threading.Event()
+
+# Create a callback on_snapshot function to capture changes
+def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        print(u'Received document snapshot: {}'.format(doc.id))
+    callback_done.set()
+
+doc_ref = db.collection(u'cities').document(u'SF')
+
+# Watch the document
+doc_watch = doc_ref.on_snapshot(on_snapshot)
+
+```
+
+## Wrapping up
+There are plenty of useful resources online to get more information about Firebase. They even have a YouTube series to get you started: [https://www.youtube.com/user/Firebase].<br><br>
+If you have any other questions, feel free to reach out to me on Discord (henrytwo#4997) or via email (henry (at) henrytu.me).<br><br>
+Good luck!
