@@ -158,7 +158,7 @@ Security rules are important because they keep your data safe. Without them, peo
 By default, these rules live in the `firestore.rules` file and are pushed automatically when `firebase deploy` is run.<br><br>
 Due to limited time, we won't be focusing too much on this.<br><br>
 Example security rule:
-```json
+```
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
