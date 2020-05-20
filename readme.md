@@ -290,24 +290,33 @@ Detailed guide: [https://firebase.google.com/docs/firestore/quickstart] (Switch 
 This is the same idea as using Firestore on the web.
 
 ```python
-doc_ref = db.collection(u'users').document(u'alovelace')
+doc_ref = db.collection('users').document('alovelace')
 doc_ref.set({
-    u'first': u'Ada',
-    u'last': u'Lovelace',
-    u'born': 1815
+    'first': 'Ada',
+    'last': 'Lovelace',
+    'born': 1815
 })
 ```
 
-#### Get data from Cloud Firestore
+#### Get a single document from Cloud Firestore
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data] (Switch to Python tab)
 ```python
-doc_ref = db.collection(u'cities').document(u'SF')
+doc_ref = db.collection('cities').document('SF')
 
 doc = doc_ref.get()
 if doc.exists:
-    print(u'Document data: {}'.format(doc.to_dict()))
+    print('Document data: {}'.format(doc.to_dict()))
 else:
-    print(u'No such document!')
+    print('No such document!')
+```
+
+#### Get multiple documenets from Cloud Firestore
+Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data] (Switch to Python tab)
+```python
+docs = db.collection('cities').stream()
+
+for doc in docs:
+    print('{} => {}'.format(doc.id, doc.to_dict()))
 ```
 
 #### Getting realtime updates from Cloud Firestore
@@ -322,10 +331,10 @@ callback_done = threading.Event()
 # Create a callback on_snapshot function to capture changes
 def on_snapshot(doc_snapshot, changes, read_time):
     for doc in doc_snapshot:
-        print(u'Received document snapshot: {}'.format(doc.id))
+        print('Received document snapshot: {}'.format(doc.id))
     callback_done.set()
 
-doc_ref = db.collection(u'cities').document(u'SF')
+doc_ref = db.collection('cities').document('SF')
 
 # Watch the document
 doc_watch = doc_ref.on_snapshot(on_snapshot)

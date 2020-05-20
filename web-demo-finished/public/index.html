@@ -79,7 +79,7 @@
       var db = firebase.firestore();
 
       // Setup DB listener
-      function setupDB() {
+      function setupDBListener() {
         db.collection("items")
         .orderBy("timestamp", "desc")
         .onSnapshot(function(querySnapshot) {
@@ -98,23 +98,9 @@
       // (ex. User logs in first time, or page is loaded and they're already logged in)
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
-          sessionStorage.name = user.displayName;
-
-          $('#login').css("display", "none");
-          $('#main-list').css("display", "inline");
-          $('#signout').css("display", "inline");
-
-          $('#username').text(`Signed in as ${user.displayName}`);
-
-          setupDB();
+          onLogin(user);
         } else {
-          // The user is not logged in, hide the messenger content
-          $('#login').css("display", "inline");
-          $('#main-list').css("display", "none");
-          $('#signout').css("display", "none");
-
-
-          $('#username').text(`Signed out`);
+          onLogout();
         }
       });
 
@@ -140,18 +126,6 @@
         });
       });
 
-      $("#submit").on("click", function () {
-        submitForm();
-      });
-
-      // Submit when enter key is pressed
-      $('#input-group').keypress(function(event){
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode === 13){
-          submitForm();
-        }
-      });
-
       function submitForm() {
         let newText = $("#textbox").val();
 
@@ -175,6 +149,18 @@
         }
       }
 
+      $("#submit").on("click", function () {
+        submitForm();
+      });
+
+      // Submit when enter key is pressed
+      $('#input-group').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode === 13){
+          submitForm();
+        }
+      });
+
       // Ghetto method to list items on screen
       function setList(list) {
         // Ghetto solution to avoid JS injection
@@ -192,6 +178,28 @@
         $('html, body').stop().animate({
           'scrollTop': document.body.scrollHeight
         }, 500, 'swing');
+      }
+
+      function onLogin(user) {
+        sessionStorage.name = user.displayName;
+
+        $('#login').css("display", "none");
+        $('#main-list').css("display", "inline");
+        $('#signout').css("display", "inline");
+
+        $('#username').text(`Signed in as ${user.displayName}`);
+
+        setupDBListener();
+      }
+
+      function onLogout() {
+        // The user is not logged in, hide the messenger content
+        $('#login').css("display", "inline");
+        $('#main-list').css("display", "none");
+        $('#signout').css("display", "none");
+
+
+        $('#username').text(`Signed out`);
       }
     });
   </script>
