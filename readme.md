@@ -33,7 +33,7 @@ Go to the console at [https://console.firebase.google.com/] and create a new pro
 
 ### Setup
 After you configure Firebase on the console, open your editor of choice and create a new directory to house your project. Navigate to this directory through your console and run `firebase init`.<br><br>
-If you followed the instructions properly, it should ask you to select Firebase CLI features. You can change your selection later on by running `firebase init` again, but let's select everything we need at once to save time.<br><br>
+If you followed the instructions properly, it should ask you to select Firebase CLI features. You can change your selection later on by running `firebase init` again, but lets select everything we need at once to save time.<br><br>
 For this workshop, select:
 - Hosting
 - Firestore
@@ -43,7 +43,7 @@ Next, it will ask you to select a project to link to. Go ahead and find the proj
 Finally, the CLI will ask to confirm the names of files to generate. If you hit enter a few times it'll use the default settings.
 
 ### Firebase Hosting
-A cool feature of Firebase Hosting is their global CDN. This means that Firebase will automatically cache your website in multiple geographic location to ensure that it can be accessed quickly from anywhere. Additionally, Firebase handles all the scaling so any sudden spikes in usage are no problem.<br><br>
+A cool feature of Firebase Hosting is their global CDN. This means that Firebase will automatically cache your website in multiple geographic locations to ensure that it can be accessed quickly from anywhere. Additionally, Firebase handles all the scaling so any sudden spikes in usage are no problem.<br><br>
 Here is a partial structure of your project so far:<br>
 ```
 yourProject
@@ -54,7 +54,7 @@ yourProject
 ```
 
 If you used the default settings, everything under the `public`  folder will be accessible when your website is published. This is your website root.<br><br>
-To host your own content, simply place it in this directory. After that's done, you can publish it by running `firebase deploy`. Notice that Firebase automatically generates a URL which can be immediately used to access your website. A custom domain can be configured via the Firebase console.<br><br>
+To host your own content, simply place it in this directory. After that's done, you can publish it by running `firebase deploy`. Notice that Firebase automatically generates an URL which can be immediately used to access your website. A custom domain can be configured via the Firebase console.<br><br>
 Alternatively,  you can start the local development server by running `firebase serve`. This will come in handy when we need to test our website.
 
 #### Setting up the libraries
@@ -77,9 +77,9 @@ let app = firebase.app();
 
 ### Firebase Cloud Firestore
 A really useful service that Firebase offers is Cloud Firestore. It's a realtime document based database. This means that Firestore will automatically propogate changes in the database to all connected apps in real time.<br><br>
-First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, let's select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
+First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, lets select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
 (Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)<br><br>
-If you open up the Firebase console to the Firestore tab, you'll be ablee to see changes pushed to the DB in real time.
+If you open up the Firebase console to the Firestore tab, you'll be able to see changes pushed to the DB in real time.
 
 #### Database structure
 Firebase has a few different levels in its structure. At the highest level, there are collections which must be uniquely named. Collections contain documents which themselves can contain many fields. This is where you store your conventional data (i.e. strings, integers, or other collections!, etc.)<br><br>
