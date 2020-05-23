@@ -1,7 +1,7 @@
-# MasseyHacks Firebase Workshop
+# MasseyHacks Firebase Workshop (and a tiny bit of app security)
 ## By Henry Tu
 
-## Introduction
+## Introduction (10 mins)
 
 ### Starter code
 Since this workshop will be focused on the Firebase services, I'm going to be working with some website code that I've already baked ahead of time.<br><br>
@@ -26,10 +26,19 @@ macOS/Linux: Run `curl -sL https://firebase.tools | bash`
 <br><br>
 Now, open a console and type `firebase login` to authenticate. After that's setup, you're ready to create your first project!
 
+## Basic application security
+When developing any web app, it's always to keep security in the back of your mind. Not only will this save you from headache later on, it could also save you money.<br><br>
+Here are some easy steps to get you started:
+- Add sensitive files (Such as API keys)  to `.gitignore` to  prevent them from being leaked
+- Never trust user input and always sanitize (Keep your hands  clean!)
+- Keep your   packages up to date
+- Use `https` as much  as possible to avoid MITM attacks
+
+
 ### Creating a project
 Go to the console at [https://console.firebase.google.com/] and create a new project. Go to the services that you want to use (i.e. Authentication, Cloud Firestore, etc.) and configure them. I'll go into more details when I discuss the individual services.
 
-## Firebase on the web
+## Firebase on the web (10 mins)
 
 ### Setup
 After you configure Firebase on the console, open your editor of choice and create a new directory to house your project. Navigate to this directory through your console and run `firebase init`.<br><br>
@@ -75,7 +84,7 @@ let app = firebase.app();
 
 (Note: Usually you would have to configure your API key here, but since we're using Firebase Hosting your project will be automatically linked!)
 
-### Firebase Cloud Firestore
+### Firebase Cloud Firestore (20 mins)
 A really useful service that Firebase offers is Cloud Firestore. It's a realtime document based database. This means that Firestore will automatically propogate changes in the database to all connected apps in real time.<br><br>
 First, we'll setup Firestore in the console. You'll receive a prompt asking whether you want to start in `production mode` or `test mode`. For now, let's select `test mode` so that we have unrestricted access to the DB. In practice, you'll want to lock this down so that people can't mess with your data.<br><br>
 (Tip: For hackathons, it isn't a big priority to secure your DB. Focus on getting your hack working!)<br><br>
@@ -127,7 +136,7 @@ db.collection("cities").add({
 
 #### Reading data
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/get-data]<br><br>
-We can read data directly if we know the path:
+We can read data from a document directly if we know the path:
 ```javascript
 db.collection("cities").doc("SF").get().then(function(doc) {
     if (doc.exists) {
@@ -140,6 +149,7 @@ db.collection("cities").doc("SF").get().then(function(doc) {
     console.log("Error getting document:", error);
 });
 ```
+For reading multiple documents at a time, more details are in the documentation.
 
 #### Listening for changes
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen#web]<br><br>
@@ -175,6 +185,8 @@ Breakdown:
 - `request.auth.uid` is the `uid` of the user initiating request
 - `request.resource.data` is the object being read/written (All sub attributes are the data itself)
 
+The rules page has a simulator for testing rules under different environments.
+
 #### Best practices for handling data
 A good general rule of thumb is to never trust data that users provide. Let's say you're making a Twitter clone. Simple enough right? Just take whatever text they give you and add it to your HTML. Well... there's a bit of a problem with that. If you don't sanitize your input and treat it as HTML, a cleaver attacker could do something like submitting:
 ```html
@@ -184,7 +196,7 @@ A good general rule of thumb is to never trust data that users provide. Let's sa
 ```
 How do you prevent an attack like this? Depending on what you're using to build your website, there are different approaches. Frameworks such as Vue.js and React already have features to escape text and prevent this sort of attack. If you're using jQuery, `$(yourElement).text(userText)` is generally safe. Just be careful to never use `$(yourElement).html(userText)` since this will cause the user input to be treated as HTML.
 
-### Firebase Authentication
+### Firebase Authentication (10 mins)
 Detailed guide: [https://firebase.google.com/docs/auth]<br><br>
 Firebase Authentication integrates nicely with other services such as Firestore. It allows users to sign in with Email/Password or through other services such as Google, Facebook, etc. No matter which method they choose to use, Firebase handles the complicated OAUTH and links all the authentication methods together. This means you only need to worry about writing one set of code and Firebase will handle the rest.
 
@@ -257,7 +269,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 });
 ```
 
-### Firebase Python Admin SDK
+### Firebase Python Admin SDK (10 mins)
 Detailed guide: [https://firebase.google.com/docs/reference/admin]<br><br>
 The Python Admin SDK is designed primarily for managing your Firebase app from your backend. Although you aren't supposed to use it for client applications, you can use it to quickly interface with Firebase services.
 
