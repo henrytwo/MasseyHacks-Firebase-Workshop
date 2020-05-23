@@ -77,7 +77,7 @@ Since we're using Firebase Hosting, we can use the integrated CDN to serve all o
 <script defer src="/__/firebase/init.js"></script>
 ```
 A full list can be found here: [https://firebase.google.com/docs/web/setup#available-libraries]<br><br>
-Next, start a JS file and initialize Firebase by creating a Firebase app object:
+Next, initialize Firebase by creating a Firebase app object:
 ```javascript
 let app = firebase.app();
 ```
@@ -128,9 +128,9 @@ db.collection("cities").doc("new-city-id").set({
 This is useful if you know the exact document ID you want.<br><br>
 To add data with an auto generated document ID:
 ```javascript
-db.collection("cities").add({
-    name: "Tokyo",
-    country: "Japan"
+db.collection("items").add({          
+    text: "Test",
+    timestamp: new Date().getTime()
 })
 ```
 
@@ -153,13 +153,30 @@ For reading multiple documents at a time, more details are in the documentation.
 
 #### Listening for changes
 Detailed guide: [https://firebase.google.com/docs/firestore/query-data/listen#web]<br><br>
-We can also automatically listen for changes to the database:
+We can also automatically listen for changes to the database:<br><br>
+Single document:
 ```javascript
 db.collection("cities").doc("SF")
     .onSnapshot(function(doc) {
         console.log("Current data: ", doc.data());
     });
 ```
+
+Multiple documents:
+```javascript
+db.collection("items")
+  .orderBy("timestamp")
+  .onSnapshot(function(querySnapshot) {
+    var items = [];
+
+    querySnapshot.forEach(function(doc) {
+      items.push(doc.data());
+    });
+
+    console.log(items);
+  })
+```
+
 This function will fire every time there is a change to the document.
 
 #### Security
@@ -173,7 +190,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
       allow read: if request.auth.uid != null;
-      allow create: if request.auth.uid != null && request.resource.data.owner == request.auth.uid && request.resource.data.text.size() <= 128;
+      allow create: if request.auth.uid != null && request.resource.data.owner == request.auth.token.name && request.resource.data.text.size() <= 128;
       allow update: if false;
       allow delete: if false;
       allow write: if false;
@@ -182,6 +199,7 @@ service cloud.firestore {
 }
 ```
 Breakdown:
+- `request.auth.token.name` is the `name` of the user initiating request
 - `request.auth.uid` is the `uid` of the user initiating request
 - `request.resource.data` is the object being read/written (All sub attributes are the data itself)
 

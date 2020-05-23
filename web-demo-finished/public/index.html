@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MasseyHacks Messenger</title>
 
-  <!-- update the version number as needed -->
-  <script defer src="/__/firebase/7.14.4/firebase-app.js"></script>
-  <script defer src="/__/firebase/7.14.4/firebase-auth.js"></script>
-  <script defer src="/__/firebase/7.14.4/firebase-firestore.js"></script>
-  <script defer src="/__/firebase/init.js"></script>
+  <!-- ADD FIREBASE LIBRARIES HERE -->
 
+  <!-- Other libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -81,7 +78,7 @@
       // Setup DB listener
       function setupDBListener() {
         db.collection("items")
-        .orderBy("timestamp", "desc")
+        .orderBy("timestamp")
         .onSnapshot(function(querySnapshot) {
           var items = [];
 
@@ -89,7 +86,7 @@
             items.push(doc.data());
           });
 
-          setList(items.reverse());
+          setList(items);
         });
       }
 
