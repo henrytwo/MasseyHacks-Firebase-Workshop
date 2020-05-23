@@ -6,6 +6,11 @@
   <title>MasseyHacks Messenger</title>
 
   <!-- ADD FIREBASE LIBRARIES HERE -->
+  <!-- update the version number as needed -->
+  <script defer src="/__/firebase/7.14.4/firebase-app.js"></script>
+  <script defer src="/__/firebase/7.14.4/firebase-auth.js"></script>
+  <script defer src="/__/firebase/7.14.4/firebase-firestore.js"></script>
+  <script defer src="/__/firebase/init.js"></script>
 
   <!-- Other libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -159,16 +164,18 @@
       });
 
       // Ghetto method to list items on screen
+      // It's better to only add the items that have changed, but
+      // we're  going to replace everything for simplicity
       function setList(list) {
         // Ghetto solution to avoid JS injection
         $('#list-area').html('');
 
-        for (let index in list) {
-          let id = Math.random().toString().substring(2);
+        for (let index = 0; index < list.length; index++) {
 
-          $("#list-area").append("<div id=\"" + id + "\"class=\"alert alert-secondary\" role=\"alert\"></div>");
+          // Create element and then set inner text
+          $("#list-area").append(`<div id="message-${index}" class=\"alert alert-secondary\" role=\"alert\"></div>`);
 
-          $('#' + id).text(`[${list[index].owner}] ${list[index].text}`);
+          $('#message-' + index).text(`[${list[index].owner}] ${list[index].text}`);
         }
 
         // Auto scroll to the bottom of the page
@@ -194,7 +201,6 @@
         $('#login').css("display", "inline");
         $('#main-list').css("display", "none");
         $('#signout').css("display", "none");
-
 
         $('#username').text(`Signed out`);
       }
