@@ -217,6 +217,8 @@ How do you prevent an attack like this? Depending on what you're using to build 
 ### Firebase Authentication (10 mins)
 Detailed guide: [https://firebase.google.com/docs/auth]<br><br>
 Firebase Authentication integrates nicely with other services such as Firestore. It allows users to sign in with Email/Password or through other services such as Google, Facebook, etc. No matter which method they choose to use, Firebase handles the complicated OAUTH and links all the authentication methods together. This means you only need to worry about writing one set of code and Firebase will handle the rest.
+<br><br>
+Important: If you add a custom domain, be sure to add it to the list of authorized domains in order for it to work!
 
 #### Setup
 Go to the Firebase console and visit the Authentication section. Under the `Sign-In method` tab, enable the methods that you want users to be able to log in with.<br><br>
